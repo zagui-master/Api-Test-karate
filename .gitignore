@@ -23,7 +23,6 @@
 /target/surefire-reports/
 
 # Archivos temporales generados
-*.json
 *.xml
 *.csv
 *.txt
