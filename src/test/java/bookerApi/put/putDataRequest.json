@@ -1,0 +1,46 @@
+{
+  "dataOk": {
+    "firstname": "Juam",
+    "lastname": "mendez",
+    "totalprice": 111,
+    "depositpaid": true,
+    "bookingdates": {
+      "checkin": "2025-08-06",
+      "checkout": "2019-08-09"
+    },
+    "additionalneeds": "Breakfast"
+  },
+  "nullValues": {
+    "firstname": null,
+    "lastname": null,
+    "totalprice": null,
+    "depositpaid": null,
+    "bookingdates": {
+      "checkin": null,
+      "checkout": null
+    },
+    "additionalneeds": null
+  },
+  "imcomplete": {
+    "totalprice": 111,
+    "depositpaid": true,
+    "bookingdates": {
+      "checkin": "2025-03-02",
+      "checkout": "2019-05-03"
+    },
+    "additionalneeds": "Breakfast"
+  },
+  "extra": {
+    "firstname": "Juam",
+    "lastname": "mendez",
+    "age": 28,
+    "email": "emailTest@gmail.com",
+    "totalprice": 111,
+    "depositpaid": true,
+    "bookingdates": {
+      "checkin": "2025-03-02",
+      "checkout": "2019-05-03"
+    },
+    "additionalneeds": "Breakfast"
+  }
+}
