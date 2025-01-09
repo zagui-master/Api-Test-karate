@@ -1,54 +1,48 @@
+@regretion
 Feature: "Como usuario, quiero verificar el comportamiento de la API al crear nuevos registros,
 utilizando tanto datos válidos como inválidos, para asegurarme de que el sistema maneje correctamente ambos casos
 
 
   Background:
-    #* def postDataRequest = read('classpath:bookerApi/post/postDataRequest.json')
-    # * def postDataResponse = read('classpath:bookerApi/post/postDataResponse.json')
-    * call read('classpath:bookerApi/helpers/generateTestData.feature')
-    * def postRequest = dataRequest
-    * def postRequestNullValue = dataRequestNullValue
-    * def postRequestPartialValues = dataRequestPartialValues
-    * def postRequestExtraValues = dataRequestExtraValues
-    * def postResponse = dataResponse
     * url baseUrl
     * header Content-Type = 'application/json'
     * header Accept = 'application/json'
+    * def getTestData =
+      """
+      function() {
+        return karate.call('classpath:bookerApi/helpers/dataGeneratorTemplate.feature');
+      }
+      """
 
+  @happyPath
   Scenario:Verificar que se puede crear un nuevo registro exitosamente con datos válidos
+    * def createRequestData = call getTestData
+    * def requestData = createRequestData.requestDataTemplate
+    * def expectedResponse = createRequestData.responseDataTemplate
+
     Given path '/booking'
-    And request postRequest
+    And request requestData
     When method POST
     Then status 200
     And match response == "#object"
-    And match response == dataResponse
+    And match response == expectedResponse
 
-  @ignore
-  Scenario:Verificar que se obtiene un código de error HTTP 404 al intentar crear un registro con un path incorrecto
-    Given path '/example'
-    And request postRequest
-    When method POST
-    Then status 404
-    And match response != "#object"
 
-  Scenario:Verificar que se obtiene un código de error HTTP 500 al intentar crear un registro con datos nulos
+  @unhappyPath
+  Scenario Outline:Verificar que se obtiene un código de error HTTP <expectedStatus> <typeOfStatus>, al intentar crear un registro con <descriptionTitle>
+    * def createRequestData = call getTestData
+    * def requestData = createRequestData
+
     Given path '/booking'
-    And request postRequestNullValue
+    And request requestData.<requestDataType>
     When method POST
-    Then status 500
+    Then status <expectedStatus>
     And match response != "#object"
+    Examples:
+      | descriptionTitle     | requestDataType            | expectedStatus | typeOfStatus  |
+      | parametros parciales | requestPartialDataTemplate | 400            | "Bad Request" |
+      | parametros vacios    | requestEmptyDataTemplate   | 400            | "Bad Request" |
+      | parametros null      | requestNullTDataTemplate   | 400            | "Bad Request" |
+      | parametros extra     | dataRequestExtraValues     | 400            | "Bad Request" |
 
-  Scenario:Verificar que se obtiene un código de error HTTP 500 al intentar crear un registro con datos incompletos
-    Given path '/booking'
-    And request postRequestPartialValues
-    When method POST
-    Then status 500
-    And match response != "#object"
-
-  Scenario:Verificar que se obtiene un código de error HTTP 500 al intentar crear un registro con datos extra
-    Given path '/booking'
-    And request postRequestExtraValues
-    When method POST
-    Then status 500
-    And match response != "#object"
 
