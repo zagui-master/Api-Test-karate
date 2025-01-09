@@ -1,86 +1,75 @@
+@regretion
 Feature:Como usuario, quiero actualizar un registro de reserva mediante el metodo PATCH, utilizando datos válidos e inválidos
 para asegurarme de que el sistema maneja correctamente ambos casos
 
+
   Background:
-    * call read('classpath:bookerApi/auth/getToken.feature')
-    * call read('classpath:bookerApi/common/createNewBooking.feature')
-    * call read('classpath:bookerApi/helpers/generateTestData.feature')
-    * def patchRequest = dataRequestPartialValues
-    * def patchRequestNullValue = dataRequestNullValue
-    * def patchRequestEmpty = dataRequestEmpty
-    * def patchRequestExtraValues = dataRequestExtraValues
-    * def patchResponse = dataRequest
-    * def patchDataRequest = read('classpath:bookerApi/patch/patchDataRequest.json')
-    * def patchDataResponse = read('classpath:bookerApi/patch/patchDataResponse.json')
+    * def getToken = call read('classpath:bookerApi/auth/getToken.feature')
     * header Content-Type = "application/json"
     * header Accept = "application/json"
-    * header Authorization = "Basic " + defaultToken
+    * header Authorization = "Basic " + getToken.defaultToken
     * url baseUrl
+    * def createBooking =
+      """
+      function() {
+        return karate.call('classpath:bookerApi/common/createNewBooking.feature');
+      }
+      """
+    * def getTestData =
+      """
+      function() {
+        return karate.call('classpath:bookerApi/helpers/dataGeneratorTemplate.feature');
+      }
+      """
 
+  @happyPath
+  Scenario:Verificar que se puede actualizar una reserva exitosamente por ID
+    * def createNewBooking = call createBooking
+    * def createRequestData = call getTestData
+    * def bookingId = createNewBooking.response.bookingid
+    * def requestData = createRequestData.requestPartialDataTemplate
+    * def expectedResponse = requestData
 
-  Scenario:Verificar que se puede actualizar una reserva exitosamente mediante el metodo PATCH con datos válidos
     Given path 'booking/' + bookingId
-    And request patchRequest
+    And request requestData
     When method PATCH
     Then status 200
     And match response == "#object"
-    And match response.firstname == patchRequest.firstname
-    And match response.lastname == patchRequest.lastname
+    And match response.firstname == expectedResponse.firstname
+    And match response.lastname == expectedResponse.lastname
 
-  Scenario:Verificar que se obtiene un código de error HTTP 404 al intentar actualizar una reserva con un path incorrecto
-    Given path '/example/' + bookingId
-    * print bookingId
-    And request patchRequest
-    When method PATCH
-    Then status 404
-    And match response != "#object"
 
-  Scenario Outline:Verificar que se obtiene un código de error HTTP 404 al intentar actualizar una reserva con un ID de caracteres especiales
-    Given path '/booking' + incorrectId
-    And request patchRequest
+  @unhappyPath
+  Scenario Outline:Verificar que se obtiene un código de error HTTP <expectedStatus> <typeOfStatus>, al intentar actualizar una reserva con ID de <descriptionTitle>
+    * def createRequestData = call getTestData
+    * def requestData = createRequestData.requestPartialDataTemplate
+
+    Given path "booking/" + <invalidId>
+    And request requestData
     When method PATCH
-    Then status 404
+    Then status <expectedStatus>
     And match response != "#object"
     Examples:
-      | incorrectId |
-      | %&/&(//(    |
+      | descriptionTitle      | invalidId | expectedStatus | typeOfStatus  |
+      | caracteres especiales | "%$&?¡"   | 400            | "Bad Request" |
+      | numeros negativos     | -1562     | 400            | "Bad Request" |
 
-  Scenario Outline:Verificar que se obtiene un código de error HTTP 404 al intentar actualizar una reserva con un ID negativo
-    Given path '/booking' + incorrectId
-    And request patchRequest
+
+  @unhappyPath
+  Scenario Outline:Verificar que se obtiene un código de error HTTP <expectedStatus> <typeOfStatus>, al intentar actualizar una reserva con <descriptionTitle>
+    * def createNewBooking = call createBooking
+    * def createRequestData = call getTestData
+    * def bookingId = createNewBooking.response.bookingid
+    * def requestData = createRequestData
+
+    Given path '/booking/' + bookingId
+    And request requestData.<requestDataType>
     When method PATCH
-    Then status 404
+    Then status <expectedStatus>
     And match response != "#object"
     Examples:
-      | incorrectId |
-      | -1562       |
-
-  Scenario:Verificar que se obtiene un código de error HTTP 404 al intentar actualizar una reserva sin proporcionar un ID
-    Given path '/booking'
-    And request patchRequest
-    When method PATCH
-    Then status 404
-    And match response != "#object"
-
-  Scenario:Verificar que se obtiene un código de error HTTP 400 al intentar actualizar una reserva con datos nulos
-    Given path '/booking/' + bookingId
-    And request patchRequestNullValue
-    When method PATCH
-    Then status 400
-    And match response != "#object"
-
-  Scenario:Verificar que se obtiene un código de error HTTP 400 al intentar actualizar una reserva sin pasarle datos
-    Given path '/booking/' + bookingId
-    And request patchRequestEmpty
-    When method PATCH
-    Then status 400
-    And match response != "#object"
-
-
-  Scenario:Verificar que se obtiene un código de error HTTP 400 al intentar actualizar una reserva con datos extra
-    Given path '/booking/' + bookingId
-    And request patchRequestExtraValues
-    When method PATCH
-    Then status 400
-    And match response != "#object"
-
+      | descriptionTitle     | requestDataType            | expectedStatus | typeOfStatus  |
+      | parametros parciales | requestPartialDataTemplate | 400            | "Bad Request" |
+      | parametros vacios    | requestEmptyDataTemplate   | 400            | "Bad Request" |
+      | parametros null      | requestNullTDataTemplate   | 400            | "Bad Request" |
+      | parametros extra     | dataRequestExtraValues     | 400            | "Bad Request" |
