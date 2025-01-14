@@ -7,16 +7,17 @@ utilizando tanto datos válidos como inválidos, para asegurarme de que el siste
     * url baseUrl
     * header Content-Type = 'application/json'
     * header Accept = 'application/json'
-    * def getTestData =
+    * def getRandomData =
       """
       function() {
         return karate.call('classpath:bookerApi/helpers/dataGeneratorTemplate.feature');
       }
       """
 
+
   @happyPath
   Scenario:Verificar que se puede crear un nuevo registro exitosamente con datos válidos
-    * def createRequestData = call getTestData
+    * def createRequestData = call getRandomData
     * def requestData = createRequestData.requestDataTemplate
     * def expectedResponse = createRequestData.responseDataTemplate
 
@@ -30,7 +31,7 @@ utilizando tanto datos válidos como inválidos, para asegurarme de que el siste
 
   @unhappyPath
   Scenario Outline:Verificar que se obtiene un código de error HTTP <expectedStatus> <typeOfStatus>, al intentar crear un registro con <descriptionTitle>
-    * def createRequestData = call getTestData
+    * def createRequestData = call getRandomData
     * def requestData = createRequestData
 
     Given path '/booking'

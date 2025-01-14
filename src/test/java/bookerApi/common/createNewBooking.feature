@@ -4,9 +4,9 @@ en otras consultas REST y asegurarme de que los datos sean procesados correctame
 
   Background:
     * url baseUrl
-     * header Content-Type = 'application/json'
+    * header Content-Type = 'application/json'
     * header Accept = 'application/json'
-    * def getTestData =
+    * def getRandomData =
       """
       function() {
         return karate.call('classpath:bookerApi/helpers/dataGeneratorTemplate.feature');
@@ -14,9 +14,9 @@ en otras consultas REST y asegurarme de que los datos sean procesados correctame
       """
 
   Scenario:Verificar que al realizar una solicitud POST para crear una nueva reserva, el sistema procesa la creación exitosamente y devuelve los datos correctos
-    * def createRequestData = call getTestData
-    * def requestData = createRequestData.requestDataTemplate
-    * def expectedResponse = createRequestData.responseDataTemplate
+    * def randomData = call getRandomData
+    * def requestData = randomData.requestDataTemplate
+    * def expectedResponse = randomData.responseDataTemplate
 
     Given path '/booking'
     And request requestData
@@ -24,6 +24,7 @@ en otras consultas REST y asegurarme de que los datos sean procesados correctame
     Then status 200
     And match response == "#object"
     And match response == expectedResponse
+
 
 
 

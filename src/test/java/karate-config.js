@@ -1,19 +1,31 @@
 function fn() {
   var env = karate.env; // get system property 'karate.env'
-  karate.log('karate.env system property was:', env);
+
+  var getUsernameFromEnv = java.lang.System.getenv('API_USER');
+  var getPasswordFromEnv = java.lang.System.getenv('API_PASSWORD');
+
+  if (!getUsernameFromEnv || !getPasswordFromEnv) {
+    throw new Error('Las variables de entorno API_USER y API_PASSWORD deben estar configuradas.');
+  }
+
   if (!env) {
     env = 'dev';
   }
+
   var config = {
     env: env,
-    myVarName: 'someValue',
-    baseUrl:'https://restful-booker.herokuapp.com'
-  }
+    baseUrl:'https://restful-booker.herokuapp.com',
+    credential:{
+        "username": getUsernameFromEnv,
+        "password": getPasswordFromEnv
+       }
+    }
+
   if (env == 'dev') {
-    // customize
-    // e.g. config.foo = 'bar';
-  } else if (env == 'e2e') {
-    // customize
-  }
+   // Configuración para ambiente de desarrollo
+  } else if (env == 'qa') {
+   // Configuración para ambiente de qa
+   }
+
   return config;
 }

@@ -1,3 +1,4 @@
+@ignore
 Feature:Template generador de data
 
   Background:
@@ -16,18 +17,30 @@ Feature:Template generador de data
             "checkin": data.checkin,
             "checkout": data.checkout
           },
-          additionalneeds: data.additionalNeeds
+          additionalneeds: data.additionalneeds
         }
       }
       """
 
     * def responseTemplate =
       """
-      function(data) {
+      function(data, requestData){
         return {
-          bookingid: '#number',
-          booking:requestTemplate(data),
-        };
+          bookingid: data.typeOfValue.number,
+          booking: requestTemplate(data)
+        }
+      }
+      """
+
+    * def requestPartialTemplate =
+      """
+      function(data){
+        return {
+          "firstname": data.firstname,
+          "lastname": data.lastname,
+          "totalprice": data.totalprice,
+          "depositpaid": data.depositpaid,
+        }
       }
       """
 
@@ -48,7 +61,7 @@ Feature:Template generador de data
       }
       """
 
-    * def requestPartialTemplate =
+    * def requestExtraValuesTemplate =
       """
       function(data){
         return {
@@ -56,26 +69,30 @@ Feature:Template generador de data
           "lastname": data.lastname,
           "totalprice": data.totalprice,
           "depositpaid": data.depositpaid,
+          "bookingdates": {
+            "checkin": data.checkin,
+            "checkout": data.checkout
+          },
+          additionalneeds: data.additionalneeds
         }
       }
       """
 
-    * def requestEmptyTemplate =
-      """
-      { }
-      """
-
-  Scenario: Verificar que tanbto como la response como la reques continen el atributo depositpaid como boolean
-    * match requestTemplate(bookingData).depositpaid == "#boolean"
-    * match responseTemplate(bookingData).booking.depositpaid == "#boolean"
-    * match requestNullTemplate(bookingData).depositpaid == "#boolean"
-    * match requestPartialTemplate(bookingData).depositpaid == "#boolean"
-    * match requestEmptyTemplate == {}
-
     * def requestDataTemplate = requestTemplate(bookingData)
     * def responseDataTemplate = responseTemplate(bookingData)
-    * def requestNullTDataTemplate = requestNullTemplate(bookingData)
     * def requestPartialDataTemplate = requestPartialTemplate(bookingData)
-    * def requestEmptyDataTemplate = requestEmptyTemplate
+    * def requestEmptyDataTemplate = {}
+    * def requestNullTDataTemplate = requestNullTemplate(bookingData)
+    * def dataRequestExtraValues = requestExtraValuesTemplate(bookingData)
+
+
+  Scenario: Verificar que tanto la response como la reques contienen el atributo depositpaid como boolean
+    * match requestTemplate(bookingData).depositpaid == "#boolean"
+    * match requestPartialTemplate(bookingData).depositpaid == "#boolean"
+    * match responseTemplate(bookingData).booking.depositpaid == "#boolean"
+    * match requestNullTemplate(bookingData).depositpaid == "#boolean"
+    * match requestExtraValuesTemplate(bookingData).depositpaid == "#boolean"
+
+
 
 

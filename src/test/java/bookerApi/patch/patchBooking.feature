@@ -7,7 +7,8 @@ para asegurarme de que el sistema maneja correctamente ambos casos
     * def getToken = call read('classpath:bookerApi/auth/getToken.feature')
     * header Content-Type = "application/json"
     * header Accept = "application/json"
-    * header Authorization = "Basic " + getToken.defaultToken
+    * header Cookie = getToken.token
+    * print getToken.token
     * url baseUrl
     * def createBooking =
       """

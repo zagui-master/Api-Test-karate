@@ -7,7 +7,7 @@ incompletos, nulos o extras
     * def getToken = call read('classpath:bookerApi/auth/getToken.feature')
     * header Content-Type = "application/json"
     * header Accept = "application/json"
-    * header Authorization = "Basic " + getToken.defaultToken
+    * header Cookie = getToken.token
     * url baseUrl
     * def createBooking =
       """
@@ -15,7 +15,7 @@ incompletos, nulos o extras
         return karate.call('classpath:bookerApi/common/createNewBooking.feature');
       }
       """
-    * def getTestData =
+    * def getRandomData =
       """
       function() {
         return karate.call('classpath:bookerApi/helpers/dataGeneratorTemplate.feature');
@@ -25,7 +25,7 @@ incompletos, nulos o extras
   @happyPath
   Scenario:Verificar que se puede actualizar una reserva exitosamente por ID
     * def createNewBooking = call createBooking
-    * def createRequestData = call getTestData
+    * def createRequestData = call getRandomData
     * def bookingId = createNewBooking.response.bookingid
     * def requestData = createRequestData.requestDataTemplate
     * def expectedResponse = requestData
@@ -40,7 +40,7 @@ incompletos, nulos o extras
 
   @unhappyPath
   Scenario Outline:Verificar que se obtiene un código de error HTTP <expectedStatus> <typeOfStatus>, al intentar actualizar una reserva con ID de <descriptionTitle>
-    * def createRequestData = call getTestData
+    * def createRequestData = call getRandomData
     * def requestData = createRequestData.dataRequest
 
     Given path 'booking/' + <invalidId>
@@ -57,7 +57,7 @@ incompletos, nulos o extras
   @unhappyPath
   Scenario Outline:Verificar que se obtiene un código de error HTTP <expectedStatus> <typeOfStatus>, al intentar actualizar una reserva con <descriptionTitle>
     * def createNewBooking = call createBooking
-    * def createRequestData = call getTestData
+    * def createRequestData = call getRandomData
     * def bookingId = createNewBooking.response.bookingid
     * def requestData = createRequestData
 

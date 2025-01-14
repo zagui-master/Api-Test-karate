@@ -1,17 +1,16 @@
-@ignore
-Feature:Get authentication token
+  #@ignore
+  Feature:Get authentication token
 
-  Background:
+    Background:
+      * url baseUrl
+      * path '/auth'
+      * header Content-Type = 'application/json'
 
-    * def credentials = read('classpath:bookerApi/auth/credentials.json')
-    * url baseUrl
-    * path '/auth'
-    * header Content-Type = 'application/json'
-
-  Scenario: Get token
-    Given request credentials
-    When method POST
-    Then status 200
-    And response.token == '#string'
-    * def token = response.token
-    * def defaultToken = "YWRtaW46cGFzc3dvcmQxMjM="
+    Scenario: Get token
+      #### THE "credential" VARIABLE IS IMPORTED FROM  "karate-config.js".#####
+      Given request credential
+      When method POST
+      Then status 200
+      And response.token == '#string'
+      * def token = "token=" + response.token
+      #karate.configuration('logPrettyRequest', true)
