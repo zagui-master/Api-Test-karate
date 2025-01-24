@@ -25,5 +25,6 @@
 # Archivos temporales generados
 *.xml
 !pom.xml
+!logback-test.xml
 *.csv
 *.txt
